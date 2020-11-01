@@ -152,8 +152,6 @@ const Functions = {
                 }
             };
 
-            console.log(params);
-
             resolve(DB.removeItem(params));
         });
     },

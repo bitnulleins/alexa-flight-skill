@@ -9,7 +9,7 @@ const Speech = require('./genericSpeech');
       return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
     handle(handlerInput) {
-      const speechText = 'Moin und herzlich Willkommen zum Hamburger Flughafen Skill. Sage "Hilfe" wenn du nicht weiter weißt oder frage nach einem Flug.';
+      const speechText = 'Moin Moin zum Hamburger Flughafen Skill. Sage "Hilfe" wenn du nicht weiter weißt oder frage nach einem Flug.';
   
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -207,15 +207,20 @@ const Speech = require('./genericSpeech');
 
       var flightnumber = operator + " " + number;
 
-      // user id
-      var userid = handlerInput.requestEnvelope.context.System.user.userId;
+      if (operator.length > 0 && operator.length <= 4 && Number.isInteger(Number.parseInt(number))) {
 
-      var result = await Flights.saveFlight(userid, flightnumber, date);
+        // user id
+        var userid = handlerInput.requestEnvelope.context.System.user.userId;
 
-      if (Object.keys(result).length == 0) {
-        var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich hinzugefügt.";
+        var result = await Flights.saveFlight(userid, flightnumber, date);
+
+        if (Object.keys(result).length == 0) {
+          var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich hinzugefügt.";
+        } else {
+          var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht hinzufügen";
+        }
       } else {
-        var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht hinzufügen";
+        var speechText = "Leider war die verstandene Flugnummer nicht korrekt. Bitte probiere es erneut."
       }
 
       return handlerInput.responseBuilder

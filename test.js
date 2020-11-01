@@ -7,6 +7,6 @@ waitingtimeHandler.getMinutes().then((minutes) => {
     console.log(minutes)
 })
 
-facts.getFact("gibt es die maskenpflicht").then((answer) => {
+facts.getFact("ich lebensmittel kaufen").then((answer) => {
     console.log(answer)
 })
