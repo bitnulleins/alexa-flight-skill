@@ -4,8 +4,8 @@ const Facts = {
     getFact(query) {
         return new Promise((resolve, reject) => {
             query = query.toLowerCase();
-            if (query == "" || query.includes("zufall") || query.includes("zufällig")) {
-                var text = this.getRandomFact() ;
+            if (query == null || query == "" || query.includes("zufall") || query.includes("zufällig")) {
+                var text = 'Hier eine zufällige Information: <break time=\"1s\"/>' + this.getRandomFact() ;
             } else if (query.includes("geschichte") || query.includes("flughafen")) {
                 var text = this.FACTS.HISTORY ;
             } else if (query.includes("mcdonalds") || query.includes("mc donalds")) {
