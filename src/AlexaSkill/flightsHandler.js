@@ -3,7 +3,6 @@ var Flight = require("../Objects/flight");
 var MyFlight = require("../Objects/myflight");
 const UtilFunctions = require('../util');
 const moment = require('moment');
-var promise = require('promise');
 
 const Functions = {
     searchForFlightnumber(flightnumber) {

@@ -1,8 +1,7 @@
 const data = require('./src/DataLoader/loadData');
-const table = require('./src/AlexaSkill/flightsHandler');
+const flightHandler = require('./src/AlexaSkill/flightsHandler');
+const waitingtimeHandler = require('./src/AlexaSkill/waitingtimesHandler');
 
-data.handler()
-
-table.searchForFlights('mallorca', null,null,null).then((resolve) => {
-    console.log(resolve)
+waitingtimeHandler.getMinutes().then((minutes) => {
+    console.log(minutes)
 })

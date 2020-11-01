@@ -46,7 +46,7 @@ requestAPI = (options) => {
         });
     
         req.on('error', function(e) {
-            console.log('Problem with request: ' + e.message);
+            console.log('Problem with Flights request: ' + e.message);
         });
         
         req.end();
