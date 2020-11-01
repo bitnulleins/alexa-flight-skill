@@ -111,7 +111,7 @@ const Speech = require('./genericSpeech');
       }
 
       return handlerInput.responseBuilder
-      .speak(speechText + " Möchtest du noch weitere Flüge suchen?")
+      .speak(speechText + '<break time="1s"/>  Möchtest du noch weitere Flüge suchen?')
       .withShouldEndSession(false)
       .reprompt("Bitte wiederhole deine Flug Anfrage.")
       .withSimpleCard('Flughafen Hamburg', speechText.replace(/<(.|\n)*?>/g, ''))
@@ -164,7 +164,7 @@ const Speech = require('./genericSpeech');
       }
 
       return handlerInput.responseBuilder
-      .speak(speechText + " Möchtest du noch etwas über den Flughafen wissen?")
+      .speak(speechText + '<break time="1s"/>  Möchtest du noch etwas über den Flughafen wissen?')
       .withShouldEndSession(false)
       .reprompt("Bitte wiederhole deine Frage.")
       .withSimpleCard('Flughafen Hamburg', speechText)

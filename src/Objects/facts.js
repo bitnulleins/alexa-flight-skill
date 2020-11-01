@@ -8,12 +8,14 @@ const Facts = {
                 var text = this.getRandomFact() ;
             } else if (query.includes("geschichte") || query.includes("flughafen")) {
                 var text = this.FACTS.HISTORY ;
-            } else if (query.includes("mcdonalds")) {
+            } else if (query.includes("mcdonalds") || query.includes("mc donalds")) {
                 var text = this.FACTS.MCDONALDS ;
             } else if (query.includes("lan") || query.includes("wlan") || query.includes("internet")) {
-                var text = this.FACTS.WLAN ;
+                var text = this.FACTS.WLAN;
+            } else if (query.includes("corona") || query.includes("maskenpflicht") || query.includes("maske")) {
+                var text = this.FACTS.CORONA;
             } else {
-                var text = "Leider konnte ich keine passende Antwort finden." ;
+                var text = "Leider konnte ich keine passende Antwort finden. Bitte probiere es mit einer anderen Frage erneut." ;
             }
             resolve(text);
         });
@@ -25,9 +27,10 @@ const Facts = {
     },
 
     FACTS : {
-        WLAN : 'Der Name des WLANs lautet: "HAM AIRPORT FREE WIFI"',
+        CORONA : 'Am Hamburger Flughafen gilt eine Maskenpflicht. Sie können sich auch auf Corona testen lassen.',
+        WLAN : 'Der Name des kostenlosen WLANs lautet: "HAM AIRPORT FREE WIFI".',
         HISTORY : 'Der Flughafen eröffnete 1911 seine Türen. Damit ist er der älteste Flughafen Deutschlands.',
-        MCDONALDS : 'Es gibt ein McDonalds in <lang xml:lang="en-US">Terminal</lang> 1.'
+        MCDONALDS : 'Es gibt einen McDonalds in <lang xml:lang="en-US">Terminal</lang> 1.'
     }
 }
 
