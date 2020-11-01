@@ -3,7 +3,6 @@ var Flight = require("../Objects/flight");
 var MyFlight = require("../Objects/myflight");
 const UtilFunctions = require('../util');
 const moment = require('moment');
-var promise = require('promise');
 
 const Functions = {
     searchForFlightnumber(flightnumber) {
@@ -152,8 +151,6 @@ const Functions = {
                     id : id.hashCode()
                 }
             };
-
-            console.log(params);
 
             resolve(DB.removeItem(params));
         });

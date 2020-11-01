@@ -14,7 +14,7 @@ const Flight = {
             airlineName : (airlineName != null) ? airlineName.toLowerCase() : null,
             flightnumber : flightnumber,
             normalizedFlightnumber : UtilFunctions.normalizeFlightnumber(flightnumber),
-            ttl: moment(sbt.substr(0,16)).add(1,'days').startOf('day').unix()
+            ttl: moment(sbt.substr(0,16)).add(2,'days').startOf('day').unix()
         }
     },
 

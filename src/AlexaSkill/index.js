@@ -1,5 +1,6 @@
 const Alexa = require('ask-sdk-core');
 const Flights = require('./flightsHandler');
+const WaitingTime = require('./waitingtimesHandler');
 const Facts = require('../Objects/facts');
 const Speech = require('./genericSpeech');
 
@@ -8,7 +9,7 @@ const Speech = require('./genericSpeech');
       return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
     handle(handlerInput) {
-      const speechText = 'Moin und herzlich Willkommen zum Hamburger Flughafen Skill. Sage "Hilfe" wenn du nicht weiter weißt oder frage nach einem Flug.';
+      const speechText = 'Moin Moin zum Hamburger Flughafen Skill. Sage "Hilfe" wenn du nicht weiter weißt oder frage nach einem Flug.';
   
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -54,8 +55,6 @@ const Speech = require('./genericSpeech');
 
       return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt("Möchtest du nach einem weiteren Flug suchen?")
-      .withShouldEndSession(false)
       .withSimpleCard('Flughafen Hamburg', speechText.replace(/<(.|\n)*?>/g, ''))
       .getResponse();
     }
@@ -105,18 +104,39 @@ const Speech = require('./genericSpeech');
 
       var flights = await Flights.searchForFlights(location, time, date, iok);
 
-      if (flights != null) {
+      if (flights != null && flights.length > 0) {
         var speechText = Speech.generateLocationSpeech(flights.slice(0,3), location);
       } else {
-        var speechText = 'Leider konnte ich keine passenden Flüge finden.';
+        var speechText = 'Leider konnte ich keine passenden Flüge für heute und morgen finden.';
       }
 
       return handlerInput.responseBuilder
-      .speak(speechText)
-      .reprompt("Möchtest du noch weiter suchen?")
+      .speak(speechText + '<break time="1s"/>  Möchtest du noch weitere Flüge suchen?')
       .withShouldEndSession(false)
+      .reprompt("Bitte wiederhole deine Flug Anfrage.")
       .withSimpleCard('Flughafen Hamburg', speechText.replace(/<(.|\n)*?>/g, ''))
       .getResponse();
+    }
+  };
+
+  const WaitingTimeIntent = {
+    canHandle(handlerInput) {
+      return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'WaitingTimeIntent';
+    },
+    async handle(handlerInput) {
+      let speechText = 'Aktuell kann ich keine Wartezeit für die Sicherheitskontrolle finden.'
+
+      let minutes = await WaitingTime.getMinutes();
+      if (minutes != null) {
+        let minuteSuffix = (minutes != 1) ? 'n' : '';
+        speechText = `Die aktuelle Wartezeit an der Sicherheitskontrolle beträgt ${minutes} Minute${minuteSuffix}.`;
+      }
+
+      return handlerInput.responseBuilder
+          .speak(speechText)
+          .withSimpleCard('Flughafen Hamburg', speechText)
+          .getResponse();
     }
   };
 
@@ -144,9 +164,9 @@ const Speech = require('./genericSpeech');
       }
 
       return handlerInput.responseBuilder
-      .speak(speechText)
-      .reprompt("Möchtest du noch etwas über den Flughafen wissen?")
+      .speak(speechText + '<break time="1s"/>  Möchtest du noch etwas über den Flughafen wissen?')
       .withShouldEndSession(false)
+      .reprompt("Bitte wiederhole deine Frage.")
       .withSimpleCard('Flughafen Hamburg', speechText)
       .getResponse();
     }
@@ -187,15 +207,20 @@ const Speech = require('./genericSpeech');
 
       var flightnumber = operator + " " + number;
 
-      // user id
-      var userid = handlerInput.requestEnvelope.context.System.user.userId;
+      if (operator.length > 0 && operator.length <= 4 && Number.isInteger(Number.parseInt(number))) {
 
-      var result = await Flights.saveFlight(userid, flightnumber, date);
+        // user id
+        var userid = handlerInput.requestEnvelope.context.System.user.userId;
 
-      if (Object.keys(result).length == 0) {
-        var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich hinzugefügt.";
+        var result = await Flights.saveFlight(userid, flightnumber, date);
+
+        if (Object.keys(result).length == 0) {
+          var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich hinzugefügt.";
+        } else {
+          var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht hinzufügen";
+        }
       } else {
-        var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht hinzufügen";
+        var speechText = "Leider war die verstandene Flugnummer nicht korrekt. Bitte probiere es erneut."
       }
 
       return handlerInput.responseBuilder
@@ -248,7 +273,7 @@ const Speech = require('./genericSpeech');
       if (!result.hasOwnProperty("Key")) {
         var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich entfernt."
       } else {
-        var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht entfernen.";
+        var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " heute und morgen nicht entfernen.";
       }
 
       return handlerInput.responseBuilder
@@ -297,7 +322,7 @@ const Speech = require('./genericSpeech');
         && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
     },
     handle(handlerInput) {
-      const speechText = 'Frage nach Flügen zum Beispiel mit Hilfe einer Flugnummer, Datum oder Stadtname.';
+      const speechText = 'Frage nach Flügen mit einer Flugnummer, Datum oder Stadtname. z.B. wann landet der Flug LH 008 oder welche Flüge kommen aus Mallorca.';
 
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -330,7 +355,8 @@ const Speech = require('./genericSpeech');
     },
     handle(handlerInput) {
       //any cleanup logic goes here
-      return handlerInput.responseBuilder.getResponse();
+      return handlerInput.responseBuilder
+          .getResponse();
     }
   };
 
@@ -341,7 +367,7 @@ const Speech = require('./genericSpeech');
     handle(handlerInput, error) {
       console.log(`Error handled: ${error.message}`);
 
-      var speechText = "Dat ging leider schief. Bitte wiederhole deinen Befehl.";
+      var speechText = "Leider ging etwas schief. Bitte wiederhole den Befehl.";
   
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -355,6 +381,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     LaunchRequestHandler,
     FlightIntentHandler,
     InfoIntentHandler,
+    WaitingTimeIntent,
     AddFlightIntentHelper,
     DeleteFlightIntentHelper,
     MyFlightIntentHelper,

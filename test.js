@@ -1,8 +1,12 @@
 const data = require('./src/DataLoader/loadData');
-const table = require('./src/AlexaSkill/flightsHandler');
+const flightHandler = require('./src/AlexaSkill/flightsHandler');
+const waitingtimeHandler = require('./src/AlexaSkill/waitingtimesHandler');
+const facts = require('./src/Objects/facts.js');
 
-data.handler()
+waitingtimeHandler.getMinutes().then((minutes) => {
+    console.log(minutes)
+})
 
-table.searchForFlights('mallorca', null,null,null).then((resolve) => {
-    console.log(resolve)
+facts.getFact("ich lebensmittel kaufen").then((answer) => {
+    console.log(answer)
 })
