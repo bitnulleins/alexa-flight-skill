@@ -4,7 +4,7 @@ const Facts = {
     getFact(query) {
         return new Promise((resolve, reject) => {
             query = (query !== null) ? query.toLowerCase() : query;
-            if (query.includes("etwas") || query == "" || query.includes("zufall") || query.includes("zufällig")) {
+            if (query == "mir etwas" || query == "" || query.includes("zufall") || query.includes("zufällig")) {
                 var text = 'Hier eine zufällige Information: <break time=\"0.5s\"/>' + this.getRandomFact();
             } else if (query.includes('edeka') || query.includes('lebensmittel')) {
                 var text = this.FACTS.EDEKA ;
@@ -31,7 +31,7 @@ const Facts = {
     },
 
     FACTS : {
-        LAEDEN : 'Es gibt über 30 Läden, die auch an Feiertagen geöffnet haben. Zum Beispiel Lebensmittel-, Klamotten- oder Zeitschritenläden.',
+        LAEDEN : 'Es gibt über 30 Läden, die auch an Feiertagen geöffnet haben. Zum Beispiel Lebensmittel-, Klamotten- oder Zeitschriftenläden.',
         EDEKA : 'Der Edeka im Flughafen hat 365 Tage im Jahr geöffnet.',
         OPEN : 'Der Hamburger Flughafen hat 365 Tage im Jahr von 04:00 Uhr bis 00:00 Uhr geöffnet.',
         CORONA : 'Am Hamburger Flughafen gilt eine Maskenpflicht. Es gibt auch zwei Corona Testzentren.',

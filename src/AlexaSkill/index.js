@@ -166,7 +166,6 @@ const Speech = require('./genericSpeech');
       return handlerInput.responseBuilder
       .speak(speechText + '<break time="1s"/>  Möchtest du noch etwas über den Flughafen wissen?')
       .withShouldEndSession(false)
-      .reprompt("Bitte wiederhole deine Frage.")
       .withSimpleCard('Flughafen Hamburg', speechText)
       .getResponse();
     }
@@ -178,53 +177,60 @@ const Speech = require('./genericSpeech');
         && handlerInput.requestEnvelope.request.intent.name === 'AddFlightIntent';
     },
     async handle(handlerInput) {
-      /**
-       * REQUIRED: Operator
-       */
-      let operator;
-      const operatorItem = handlerInput.requestEnvelope.request.intent.slots.Operator;
-      if (operatorItem && operatorItem.value) {
+      let confirmationStatus = handlerInput.requestEnvelope.request.intent.confirmationStatus
+      if (confirmationStatus != 'DENIED') {
+
+        /**
+         * REQUIRED: Operator
+         */
+        let operator;
+        const operatorItem = handlerInput.requestEnvelope.request.intent.slots.Operator;
+        if (operatorItem && operatorItem.value) {
           operator = operatorItem.value.toLowerCase();
-      }
+        }
 
-      /**
-       * REQUIRED: Number
-       */
-      const numberItem = handlerInput.requestEnvelope.request.intent.slots.Flightnumber;
-      let number;
-      if (numberItem && numberItem.value) {
+        /**
+         * REQUIRED: Number
+         */
+        const numberItem = handlerInput.requestEnvelope.request.intent.slots.Flightnumber;
+        let number;
+        if (numberItem && numberItem.value) {
           number = numberItem.value.toLowerCase();
-      }
+        }
 
-      /**
-       * REQUIRED: Date
-       */
-      const dateItem = handlerInput.requestEnvelope.request.intent.slots.Date;
-      let date;
-      if (dateItem && dateItem.value) {
+        /**
+         * REQUIRED: Date
+         */
+        const dateItem = handlerInput.requestEnvelope.request.intent.slots.Date;
+        let date;
+        if (dateItem && dateItem.value) {
           date = dateItem.value.toLowerCase();
-      }
+        }
 
-      var flightnumber = operator + " " + number;
+        var flightnumber = operator + " " + number;
 
-      if (operator.length > 0 && operator.length <= 4 && Number.isInteger(Number.parseInt(number))) {
+        if (operator.length > 0 && operator.length <= 4 && Number.isInteger(Number.parseInt(number))) {
 
-        // user id
-        var userid = handlerInput.requestEnvelope.context.System.user.userId;
+          // user id
+          var userid = handlerInput.requestEnvelope.context.System.user.userId;
 
-        var result = await Flights.saveFlight(userid, flightnumber, date);
+          var result = await Flights.saveFlight(userid, flightnumber, date);
 
-        if (Object.keys(result).length == 0) {
-          var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich hinzugefügt.";
+          if (Object.keys(result).length == 0) {
+            var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich deiner Liste hinzugefügt.";
+          } else {
+            var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht finden und zu deiner Liste hinzufügen";
+          }
         } else {
-          var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " nicht hinzufügen";
+          var speechText = "Leider war die verstandene Flugnummer nicht korrekt. Bitte probiere es erneut."
         }
       } else {
-        var speechText = "Leider war die verstandene Flugnummer nicht korrekt. Bitte probiere es erneut."
+        var speechText  = "Alles klar, ich habe den Flug nicht hinzugefügt."
       }
 
       return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(true)
       .withSimpleCard('Flughafen Hamburg', speechText)
       .getResponse();
     }
@@ -236,48 +242,54 @@ const Speech = require('./genericSpeech');
         && handlerInput.requestEnvelope.request.intent.name === 'DeleteFlightIntent';
     },
     async handle(handlerInput) {
-      /**
-       * REQUIRED: Operator
-       */
-      let operator;
-      const operatorItem = handlerInput.requestEnvelope.request.intent.slots.Operator;
-      if (operatorItem && operatorItem.value) {
-          operator = operatorItem.value.toLowerCase();
-      }
-
-      /**
-       * REQUIRED: Number
-       */
-      const numberItem = handlerInput.requestEnvelope.request.intent.slots.Flightnumber;
-      let number;
-      if (numberItem && numberItem.value) {
-          number = numberItem.value.toLowerCase();
-      }
+      let confirmationStatus = handlerInput.requestEnvelope.request.intent.confirmationStatus
+      if (confirmationStatus != 'DENIED') {
+        /**
+         * REQUIRED: Operator
+         */
+        let operator;
+        const operatorItem = handlerInput.requestEnvelope.request.intent.slots.Operator;
+        if (operatorItem && operatorItem.value) {
+            operator = operatorItem.value.toLowerCase();
+        }
 
         /**
-       * REQUIRED: Date
-       */
-      const dateItem = handlerInput.requestEnvelope.request.intent.slots.Date;
-      let date;
-      if (dateItem && dateItem.value) {
-          date = dateItem.value.toLowerCase();
-      }
+         * REQUIRED: Number
+         */
+        const numberItem = handlerInput.requestEnvelope.request.intent.slots.Flightnumber;
+        let number;
+        if (numberItem && numberItem.value) {
+            number = numberItem.value.toLowerCase();
+        }
 
-      var flightnumber = operator + " " + number;
+          /**
+         * REQUIRED: Date
+         */
+        const dateItem = handlerInput.requestEnvelope.request.intent.slots.Date;
+        let date;
+        if (dateItem && dateItem.value) {
+            date = dateItem.value.toLowerCase();
+        }
 
-      // user id
-      var userid = handlerInput.requestEnvelope.context.System.user.userId;
+        var flightnumber = operator + " " + number;
 
-      var result = await Flights.deleteFlight(userid, flightnumber, date);
+        // user id
+        var userid = handlerInput.requestEnvelope.context.System.user.userId;
 
-      if (!result.hasOwnProperty("Key")) {
-        var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich entfernt."
+        var result = await Flights.deleteFlight(userid, flightnumber, date);
+
+        if (!result.hasOwnProperty("Key")) {
+          var speechText = "Flug " + flightnumber.toUpperCase() + " erfolgreich von deiner Liste entfernt."
+        } else {
+          var speechText = "Leider konnte ich deinen Flug " + flightnumber.toUpperCase() + " nicht finden und damit auch nicht entfernen.";
+        }
       } else {
-        var speechText = "Leider konnte ich den Flug " + flightnumber.toUpperCase() + " heute und morgen nicht entfernen.";
+        var speechText  = "Alles klar, ich habe den Flug nicht gelöscht."
       }
 
       return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(true)
       .withSimpleCard('Flughafen Hamburg', speechText)
       .getResponse();
     }
