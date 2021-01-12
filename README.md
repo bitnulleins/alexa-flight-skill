@@ -9,6 +9,10 @@ Features:
 * Ask for aircraft types
 * Ask for any question about Hamburg Airport
 
+# Skill Link on Amazon
+
+Activate Skill via [Amazon Skill Store](https://www.amazon.de/dp/B08RMSFKXZ)
+
 # Tech-Stack
 
 - NodeJS deployed on Amazon AWS
